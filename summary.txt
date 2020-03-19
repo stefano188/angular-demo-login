@@ -1,0 +1,62 @@
+
+# Home
+Welcome {{ auth.currentUser?.name || 'anonymous' }}
+the point of 'currentUser' followed by '?' is to test that currentUser is present, 
+otherwise 'auth.currentUser.name' would fail because of null
+
+# install JWT (Json Web Token) library
+npm install @auth0/angular-jwt --save
+
+# RequestInterceptor
+This is a fake implementation that catch 
+- Http POST ('/api/authenticate') called by AuthService to login the user.
+    Valid email/password pairs are 
+        '1234'/'1234' for admin user who can access to 'Order' page
+        '4321'/'4321' for normal user
+
+    For valid user it returns a valid token generated with https://jwt.io/
+    Otherwise it return Http Status 400
+
+- Http GET ('/api/orders') called by OrderService to get the orders
+    Valid request must have an header with:
+        'Authorization' = 'Bearer ' + Admin Token
+    It returns a list of orders
+
+
+# AuthService
+login: call '/api/authenticate' to login and store the JWT (Json Web Token) to localStorage
+logout: remove token from localStorage
+isLoggedIn: get the token and pass to JWT Helper Service that check for token expiration
+currentUser: get the token, pass to JWT Helper Service to decode it and return the decoded token
+
+# OrderService
+getOrders: get the orders calling '/api/orders' setting header ('Authorization') as well
+
+# AuthGuard
+Implement CanActivate interface.
+Check for authenticated user by using AuthService and redirecting user to login page with 'returnUrl' 
+that enable the user to come back to the desired page once logged in.
+
+# AdminAuthGuard
+Implement CanActivate interface
+Return true if the user exists and is admin user. Otherwise returns user to no-access page.
+
+# AppModule
+RouterModule.forRoot(
+    [
+        ...
+        { path: 'admin', component: AdminComponent, canActivate: [ AuthGuard, AdminAuthGuard ] },
+        ...
+    ]
+/admin path is accessible only by 
+    authenticated user: AuthGuard canActivate should return true
+    admin user: AdminAuthGuard canActivate should return true
+
+providers: [
+    service,
+    ....
+    { provide: HTTP_INTERCEPTORS, useClass: RequestInterceptor, multi: true }
+    ....
+]
+Whenever a Http Request is made, Angular replace the Http Request with RequestInterceptor, 
+the fake implementation just to simulate responses

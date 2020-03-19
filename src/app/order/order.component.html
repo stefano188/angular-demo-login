@@ -1,0 +1,17 @@
+<div>
+    Order List
+    <table class="table">
+        <thead>
+            <th>Id</th>
+            <th>Name</th>
+        </thead>
+        <tbody>
+            <tr *ngFor="let order of $orders | async">
+                <td>{{ order.id }}</td>
+                <td>{{ order.name }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<a routerLink="/admin">Admin Home</a>

@@ -1,12 +1,10 @@
 
 <h1>Home Page</h1>
 <p >
-  Welcome user
+  Welcome {{ auth.currentUser?.name || 'anonymous' }}
 </p>
 <ul>
-  <li >
-    <a routerLink="/admin">Admin</a>
-  </li>
-  <li ><a routerLink="/login">Login</a></li>
-  <li ><a (click)="logout()">Logout</a></li>
+  <li *ngIf="auth.isLoggedIn() && auth.currentUser.admin"><a routerLink="/admin">Admin</a></li>
+  <li *ngIf="!auth.isLoggedIn()" ><a routerLink="/login">Login</a></li>
+  <li *ngIf="auth.isLoggedIn()"><a style="cursor: pointer;" (click)="logout()">Logout</a></li>
 </ul>

@@ -20,16 +20,15 @@ export class LoginComponent implements OnInit {
   }
 
   signIn(credentials) {
-    console.log(credentials);
+    console.log('signIn', credentials);
+    this.invalidLogin = true;
     this.auth.login(credentials)
       .subscribe(result => {
-        console.log(result);
         if (result) {
           let returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
           this.router.navigate([ returnUrl || '/' ]);
-        } else {
-          this.invalidLogin = true;
-        }
+          this.invalidLogin = false;
+        } 
       })
   }
 
